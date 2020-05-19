@@ -5,20 +5,15 @@ import Login from './components/Login';
 import './styles.scss';
 import BubblePage from './components/BubblePage';
 
-const App = (props) => {
+function App() {
 	return (
 		<Router>
 			<div className="App">
-				<Route exact path="/" component={Login} props={props} />
-				<PrivateRoute
-					exact
-					path="/protected"
-					component={BubblePage}
-					props={props}
-				/>
+				<Route exact path="/" component={Login} />
+				<PrivateRoute exact path="/protected" component={BubblePage} />
 			</div>
 		</Router>
 	);
-};
+}
 
 export default App;

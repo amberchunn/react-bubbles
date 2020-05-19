@@ -2,8 +2,22 @@
 // think about where will you get the id from...
 // where is is saved right now?
 
+// const deletedId = color.id;
+// const deletedId = (color) => {
+// 	if (color.id) {
+// 		{
+// 			console.log(updateColors(color));
+// 		}
+
+// 		return true;
+// 	}
+// };
+// const newColors = colors.filter((color) => color.id !== deletedId);
+// console.log(colors, newColors);
+
 import React, { useState } from 'react';
 import { axiosWithAuth } from '../util/axiosWithAuth';
+// import { useParams } from 'react-router-dom';
 
 const initialColor = {
 	color: 'red',
@@ -11,7 +25,12 @@ const initialColor = {
 const ColorList = ({ colors, updateColors }) => {
 	const [editing, setEditing] = useState(false);
 	const [colorToEdit, setColorToEdit] = useState(initialColor);
-	const [newColor, setNewColor] = useState({});
+	const [newColor, setNewColor] = useState([]);
+	// const params = useParams();
+
+	// useEffect(() => {
+	// 	updateColors();
+	// }, []);
 
 	const editColor = (color) => {
 		setEditing(true);
@@ -29,19 +48,19 @@ const ColorList = ({ colors, updateColors }) => {
 	};
 
 	const deleteColor = (color) => {
-		// make a delete request to delete this color
-		// const deletedId = color.id;
-		const deletedId = (color) => {
-			if (color.id) {
-				return true;
-			}
-		};
-		const newColors = colors.filter((color) => color.id !== deletedId);
-		console.log(colors, newColors);
+		console.log(color); //obj
+
+		// const deletedId = newColor.push(color);
+
+		setNewColor(color); // array
+		updateColors(newColor);
+
 		axiosWithAuth()
-			.delete(`/colors/${color.id}`)
-			.then((res) => console.log(res))
+			.delete(`colors/${color.id}`)
+			.then((res) => console.log(`Deleted: ${res.data}!`))
 			.catch((err) => console.log(err.response));
+
+		// history.push('/protected');
 	};
 	return (
 		<div className="colors-wrap">

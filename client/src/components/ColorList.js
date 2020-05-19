@@ -15,7 +15,7 @@
 // const newColors = colors.filter((color) => color.id !== deletedId);
 // console.log(colors, newColors);
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { axiosWithAuth } from '../util/axiosWithAuth';
 // import { useParams } from 'react-router-dom';
 
@@ -28,9 +28,9 @@ const ColorList = ({ colors, updateColors }) => {
 	const [newColor, setNewColor] = useState([]);
 	// const params = useParams();
 
-	// useEffect(() => {
-	// 	updateColors();
-	// }, []);
+	useEffect(() => {
+		updateColors(colors);
+	}, [newColor]);
 
 	const editColor = (color) => {
 		setEditing(true);
@@ -53,7 +53,8 @@ const ColorList = ({ colors, updateColors }) => {
 		// const deletedId = newColor.push(color);
 
 		setNewColor(color); // array
-		updateColors(newColor);
+		// const updated = newColor.push(color);
+		// updateColors(updated);
 
 		axiosWithAuth()
 			.delete(`colors/${color.id}`)

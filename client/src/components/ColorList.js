@@ -1,15 +1,17 @@
+// Make a put request to save your updated color
+// think about where will you get the id from...
+// where is is saved right now?
+
 import React, { useState } from 'react';
-// import axiosWithAuth from '../util/axiosWithAuth';
+import { axiosWithAuth } from '../util/axiosWithAuth';
 
 const initialColor = {
-	color: '',
-	code: { hex: '' },
+	color: 'red',
 };
-
 const ColorList = ({ colors, updateColors }) => {
-	console.log(colors);
 	const [editing, setEditing] = useState(false);
 	const [colorToEdit, setColorToEdit] = useState(initialColor);
+	const [newColor, setNewColor] = useState({});
 
 	const editColor = (color) => {
 		setEditing(true);
@@ -18,39 +20,54 @@ const ColorList = ({ colors, updateColors }) => {
 
 	const saveEdit = (e) => {
 		e.preventDefault();
-		// Make a put request to save your updated color
-		// think about where will you get the id from...
-		// where is is saved right now?
+		const id = colorToEdit.id;
+		axiosWithAuth()
+			.put(`/colors/${id}`, colorToEdit)
+			.then((res) => setNewColor(res.data))
+			// .then((res) => updateColors(newColor))
+			.catch((err) => console.log(err.response));
 	};
 
 	const deleteColor = (color) => {
 		// make a delete request to delete this color
+		// const deletedId = color.id;
+		const deletedId = (color) => {
+			if (color.id) {
+				return true;
+			}
+		};
+		const newColors = colors.filter((color) => color.id !== deletedId);
+		console.log(colors, newColors);
+		axiosWithAuth()
+			.delete(`/colors/${color.id}`)
+			.then((res) => console.log(res))
+			.catch((err) => console.log(err.response));
 	};
-
 	return (
 		<div className="colors-wrap">
 			<p>colors</p>
 			<ul>
-				{colors.map((color) => (
-					<li key={color.color} onClick={() => editColor(color)}>
-						<span>
-							<span
-								className="delete"
-								onClick={(e) => {
-									e.stopPropagation();
-									deleteColor(color);
-								}}
-							>
-								x
-							</span>{' '}
-							{color.color}
-						</span>
-						<div
-							className="color-box"
-							style={{ backgroundColor: color.code.hex }}
-						/>
-					</li>
-				))}
+				{colors &&
+					colors.map((color) => (
+						<li key={color.color} onClick={() => editColor(color)}>
+							<span>
+								<span
+									className="delete"
+									onClick={(e) => {
+										e.stopPropagation();
+										deleteColor(color);
+									}}
+								>
+									x
+								</span>{' '}
+								{color.color}
+							</span>
+							<div
+								className="color-box"
+								style={{ backgroundColor: color.code.hex }}
+							/>
+						</li>
+					))}
 			</ul>
 			{editing && (
 				<form onSubmit={saveEdit}>

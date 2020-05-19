@@ -4,14 +4,15 @@ import { axiosWithAuth } from '../util/axiosWithAuth';
 const Login = (props) => {
 	// make a post request to retrieve a token from the api
 	// when you have handled the token, navigate to the BubblePage route
-	const [credentials, setCredentials] = useState({});
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
 
 	const login = (event) => {
 		event.preventDefault();
 		axiosWithAuth()
-			.post('/login', credentials)
+			.post('/login', { username, password })
 			.then((response) => {
-				localStorage.setItem('token', response.data.token);
+				localStorage.setItem('token', response.data.payload);
 				props.history.push('/protected');
 			})
 			.catch((err) => {
@@ -19,30 +20,16 @@ const Login = (props) => {
 			});
 	};
 
-  const handleChange = event => {
-        setCredentials: {
-          ...credentials,
-          [event.target.name]: event.target.value,
-        }
-    }
-
 	return (
 		<>
 			<h1>Welcome to the Bubble App!</h1>
 			<form onSubmit={login}>
-				<input
-					type="text"
-					name="username"
-					value={credentials.username}
-					onChange={handleChange}
-				/>
+				<input type="text" onChange={(event) => setUsername(event.target.value)} />
 				<input
 					type="password"
-					name="password"
-					value={credentials.password}
-					onChange={handleChange}
+					onChange={(event) => setPassword(event.target.value)}
 				/>
-				<button>Log in</button>
+				<button>Login</button>
 			</form>
 		</>
 	);

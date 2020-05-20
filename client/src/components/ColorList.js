@@ -17,20 +17,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { axiosWithAuth } from '../util/axiosWithAuth';
-// import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+const params = useParams;
 
 const initialColor = {
-	color: 'red',
+	id: '',
+	color: '',
+	code: {},
 };
 const ColorList = ({ colors, updateColors }) => {
 	const [editing, setEditing] = useState(false);
 	const [colorToEdit, setColorToEdit] = useState(initialColor);
 	const [newColor, setNewColor] = useState([]);
-	// const params = useParams();
 
 	useEffect(() => {
 		updateColors(colors);
-	}, [newColor]);
+	}, [params.id]);
 
 	const editColor = (color) => {
 		setEditing(true);
@@ -43,25 +45,20 @@ const ColorList = ({ colors, updateColors }) => {
 		axiosWithAuth()
 			.put(`/colors/${id}`, colorToEdit)
 			.then((res) => setNewColor(res.data))
-			// .then((res) => updateColors(newColor))
+			.then((res) => console.log(`Success! ${colorToEdit.color} was updated.`))
+			// .then((res) => updateColors(colorToEdit))
 			.catch((err) => console.log(err.response));
 	};
 
 	const deleteColor = (color) => {
-		console.log(color); //obj
-
-		// const deletedId = newColor.push(color);
+		// console.log(color); //obj
 
 		setNewColor(color); // array
-		// const updated = newColor.push(color);
-		// updateColors(updated);
 
 		axiosWithAuth()
 			.delete(`colors/${color.id}`)
 			.then((res) => console.log(`Deleted: ${res.data}!`))
 			.catch((err) => console.log(err.response));
-
-		// history.push('/protected');
 	};
 	return (
 		<div className="colors-wrap">

@@ -1,38 +1,39 @@
-// Make a put request to save your updated color
-// think about where will you get the id from...
-// where is is saved right now?
-
-// const deletedId = color.id;
-// const deletedId = (color) => {
-// 	if (color.id) {
-// 		{
-// 			console.log(updateColors(color));
-// 		}
-
-// 		return true;
-// 	}
-// };
-// const newColors = colors.filter((color) => color.id !== deletedId);
-// console.log(colors, newColors);
-
 import React, { useState, useEffect } from 'react';
 import { axiosWithAuth } from '../util/axiosWithAuth';
-import { useParams } from 'react-router-dom';
-const params = useParams;
+// import { useParams } from 'react-router-dom';
 
-const initialColor = {
-	id: '',
-	color: '',
-	code: {},
-};
+const initialColor = {};
+
 const ColorList = ({ colors, updateColors }) => {
 	const [editing, setEditing] = useState(false);
+	const [colorToAdd, setColorToAdd] = useState([]);
+	const [newColor, setNewColor] = useState(initialColor);
+	const [newCode, setNewCode] = useState(initialColor);
 	const [colorToEdit, setColorToEdit] = useState(initialColor);
-	const [newColor, setNewColor] = useState([]);
 
 	useEffect(() => {
-		updateColors(colors);
-	}, [params.id]);
+		axiosWithAuth()
+			.get(`/colors`)
+			.then((res) => console.log(res.data))
+			.catch((err) => console.log(err.response));
+	}, [colors, updateColors]);
+
+	const saveColor = (event) => {
+		event.preventDefault();
+		const id = Date.now();
+
+		const data = { color: newColor, code: { hex: newCode }, id: id };
+
+		setColorToAdd(data);
+
+		console.log(colors, { data });
+
+		axiosWithAuth()
+			.post(`/colors`, colorToAdd)
+			// .then((res) => console.log(res))
+			.then((res) => updateColors(res.data))
+			.catch((err) => console.log(err.response));
+	};
 
 	const editColor = (color) => {
 		setEditing(true);
@@ -44,16 +45,13 @@ const ColorList = ({ colors, updateColors }) => {
 		const id = colorToEdit.id;
 		axiosWithAuth()
 			.put(`/colors/${id}`, colorToEdit)
-			.then((res) => setNewColor(res.data))
 			.then((res) => console.log(`Success! ${colorToEdit.color} was updated.`))
-			// .then((res) => updateColors(colorToEdit))
 			.catch((err) => console.log(err.response));
 	};
 
 	const deleteColor = (color) => {
 		// console.log(color); //obj
-
-		setNewColor(color); // array
+		// setNewColor(color); // array
 
 		axiosWithAuth()
 			.delete(`colors/${color.id}`)
@@ -116,8 +114,26 @@ const ColorList = ({ colors, updateColors }) => {
 					</div>
 				</form>
 			)}
-			<div className="spacer" />
-			{/* stretch - build another form here to add a color */}
+			<div className="spacer">
+				<h3>Add a New Color</h3>
+				{/* stretch - build another form here to add a color */}
+				{
+					<form onSubmit={saveColor}>
+						<legend>add new color</legend>
+						<label>
+							color name:
+							<input onChange={(event) => setNewColor(event.target.value)} />
+						</label>
+						<label>
+							hex code:
+							<input onChange={(event) => setNewCode(event.target.value)} />
+						</label>
+						<div className="button-row">
+							<button type="submit">save</button>
+						</div>
+					</form>
+				}
+			</div>
 		</div>
 	);
 };

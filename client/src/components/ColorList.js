@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { axiosWithAuth } from '../util/axiosWithAuth';
-// import { useParams } from 'react-router-dom';
 
 const initialColor = {};
 
 const ColorList = ({ colors, updateColors }) => {
 	const [editing, setEditing] = useState(false);
-	const [colorToAdd, setColorToAdd] = useState([]);
+	// const [colorToAdd, setColorToAdd] = useState([]);
 	const [newColor, setNewColor] = useState(initialColor);
 	const [newCode, setNewCode] = useState(initialColor);
 	const [colorToEdit, setColorToEdit] = useState(initialColor);
@@ -19,20 +18,16 @@ const ColorList = ({ colors, updateColors }) => {
 	}, [colors, updateColors]);
 
 	const saveColor = (event) => {
-		event.preventDefault();
 		const id = Date.now();
 
 		const data = { color: newColor, code: { hex: newCode }, id: id };
 
-		setColorToAdd(data);
-
-		console.log(colors, { data });
-
 		axiosWithAuth()
-			.post(`/colors`, colorToAdd)
-			// .then((res) => console.log(res))
+			.post(`/colors`, data)
 			.then((res) => updateColors(res.data))
+			.then((res) => alert(`Color has been ${res}!`))
 			.catch((err) => console.log(err.response));
+		event.preventDefault();
 	};
 
 	const editColor = (color) => {
@@ -40,22 +35,19 @@ const ColorList = ({ colors, updateColors }) => {
 		setColorToEdit(color);
 	};
 
-	const saveEdit = (e) => {
-		e.preventDefault();
+	const saveEdit = (event) => {
 		const id = colorToEdit.id;
 		axiosWithAuth()
 			.put(`/colors/${id}`, colorToEdit)
-			.then((res) => console.log(`Success! ${colorToEdit.color} was updated.`))
+			.then((res) => alert(`Success! ${colorToEdit.color} was updated.`))
 			.catch((err) => console.log(err.response));
+		event.preventDefault();
 	};
 
 	const deleteColor = (color) => {
-		// console.log(color); //obj
-		// setNewColor(color); // array
-
 		axiosWithAuth()
 			.delete(`colors/${color.id}`)
-			.then((res) => console.log(`Deleted: ${res.data}!`))
+			.then((res) => alert(`Deleted: ${res.data.color}!`))
 			.catch((err) => console.log(err.response));
 	};
 	return (
